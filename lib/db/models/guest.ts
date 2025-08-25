@@ -18,6 +18,6 @@ export class GuestModel {
       .find({ session_id: sessionId })
       .sort({ created_at: -1 })
       .toArray();
-    return guests.map(g => ({ ...g, _id: g._id.toString() }));
+    return guests.map(g => ({ ...g, _id: g._id.toString() } as GuestSignUp));
   }
 }

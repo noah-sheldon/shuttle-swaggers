@@ -134,8 +134,8 @@ export class SessionAlgorithm {
           wins: player.wins + 1,
           points_for: player.points_for + winnerScore,
           points_against: player.points_against + loserScore,
-          played_with: [...new Set([...player.played_with, ...winnerTeam.filter(id => id !== player.player_id)])],
-          played_against: [...new Set([...player.played_against, ...loserTeam])]
+          played_with: Array.from(new Set([...player.played_with, ...winnerTeam.filter(id => id !== player.player_id)])),
+          played_against: Array.from(new Set([...player.played_against, ...loserTeam]))
         };
       } else if (loserTeam.includes(player.player_id)) {
         return {
@@ -143,8 +143,8 @@ export class SessionAlgorithm {
           losses: player.losses + 1,
           points_for: player.points_for + loserScore,
           points_against: player.points_against + winnerScore,
-          played_with: [...new Set([...player.played_with, ...loserTeam.filter(id => id !== player.player_id)])],
-          played_against: [...new Set([...player.played_against, ...winnerTeam])]
+          played_with: Array.from(new Set([...player.played_with, ...loserTeam.filter(id => id !== player.player_id)])),
+          played_against: Array.from(new Set([...player.played_against, ...winnerTeam]))
         };
       }
       return player;

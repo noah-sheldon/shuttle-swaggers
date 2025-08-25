@@ -15,7 +15,7 @@ export class SessionModel {
     const db = await getDb();
     const session = await db.collection(this.collection).findOne({ _id: new ObjectId(id) });
     if (!session) return null;
-    return { ...session, _id: session._id.toString() };
+    return { ...session, _id: session._id.toString() } as Session;
   }
 
   static async findUpcoming(): Promise<Session[]> {
@@ -27,7 +27,7 @@ export class SessionModel {
       })
       .sort({ date: 1 })
       .toArray();
-    return sessions.map(s => ({ ...s, _id: s._id.toString() }));
+    return sessions.map(s => ({ ...s, _id: s._id.toString() } as Session));
   }
 
   static async findLive(): Promise<Session | null> {
@@ -37,7 +37,7 @@ export class SessionModel {
       status: 'live'
     });
     if (!session) return null;
-    return { ...session, _id: session._id.toString() };
+    return { ...session, _id: session._id.toString() } as Session;
   }
 
   static async updatePlayerData(sessionId: string, playerData: Player[]): Promise<void> {
@@ -98,7 +98,7 @@ export class SessionModel {
       .sort({ completed_at: -1 })
       .limit(limit)
       .toArray();
-    return sessions.map(s => ({ ...s, _id: s._id.toString() }));
+    return sessions.map(s => ({ ...s, _id: s._id.toString() } as Session));
   }
 
   static async findAll(): Promise<Session[]> {
@@ -107,6 +107,6 @@ export class SessionModel {
       .find({})
       .sort({ date: -1 })
       .toArray();
-    return sessions.map(s => ({ ...s, _id: s._id.toString() }));
+    return sessions.map(s => ({ ...s, _id: s._id.toString() } as Session));
   }
 }

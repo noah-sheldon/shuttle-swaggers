@@ -3,10 +3,11 @@ import { SessionModel } from '@/lib/db/models/session';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { action } = await request.json();
+    const params = await context.params;
     
     if (action === 'start') {
       // Check if there's already a live session

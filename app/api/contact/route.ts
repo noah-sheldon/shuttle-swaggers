@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     // Send email to admin
     const { data, error } = await resend.emails.send({
-      from: 'Watford Shuttlers <noreply@watfordshuttlers.com>',
+      from: 'Shuttle Swaggers <noreply@shuttleswaggers.com>',
       to: ['shuttleswaggersbc@gmail.com'],
       subject: `Contact Form: ${subject}`,
       html: `

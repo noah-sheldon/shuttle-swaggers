@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
+// import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Check, Loader2, MapPin, Clock, Calendar } from 'lucide-react';
 
 interface SessionData {
@@ -196,7 +196,13 @@ export function GuestSignupForm({ session, onBack, onComplete }: GuestSignupForm
                 </div>
               ))}
             </div>
-            <Progress value={(currentStep / 3) * 100} className="h-2" />
+            {/* <Progress value={(currentStep / 3) * 100} className="h-2" /> */}
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-[#ff6f00] h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${(currentStep / 3) * 100}%` }}
+              ></div>
+            </div>
             <div className="flex justify-between mt-2 text-sm text-gray-600">
               <span>Personal Details</span>
               <span>Skill Assessment</span>

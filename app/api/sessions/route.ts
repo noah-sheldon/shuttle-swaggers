@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       matches: [],
       rankings: [],
       is_live: false,
+      status: 'upcoming' as const,
       waiting_queue: []
     };
 

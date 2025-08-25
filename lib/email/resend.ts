@@ -10,13 +10,13 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendGuestConfirmation(guest: GuestSignUp, sessionDetails: any) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Watford Shuttlers <noreply@watfordshuttlers.com>',
+      from: 'Shuttle Swaggers <noreply@shuttleswaggers.com>',
       to: [guest.email],
-      subject: 'Welcome to Watford Shuttlers - Sign-up Confirmation',
+      subject: 'Welcome to Shuttle Swaggers - Sign-up Confirmation',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: #004d40; color: white; padding: 20px; text-align: center;">
-            <h1>Welcome to Watford Shuttlers!</h1>
+            <h1>Welcome to Shuttle Swaggers!</h1>
           </div>
           
           <div style="padding: 20px; background: #f5f5f5;">
@@ -43,7 +43,7 @@ export async function sendGuestConfirmation(guest: GuestSignUp, sessionDetails: 
             
             <p>We look forward to seeing you on court!</p>
             
-            <p>Best regards,<br>The Watford Shuttlers Team</p>
+            <p>Best regards,<br>The Shuttle Swaggers Team</p>
           </div>
         </div>
       `,
@@ -64,7 +64,7 @@ export async function sendGuestConfirmation(guest: GuestSignUp, sessionDetails: 
 export async function sendAdminNotification(guest: GuestSignUp, sessionDetails: any) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Watford Shuttlers <noreply@watfordshuttlers.com>',
+      from: 'Shuttle Swaggers <noreply@shuttleswaggers.com>',
       to: ['shuttleswaggersbc@gmail.com'],
       subject: `New Guest Sign-up: ${guest.name}`,
       html: `
