@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Search, Calendar, User, Clock } from 'lucide-react'
+import { Search, Calendar, User, Clock, BookOpen } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Badminton Blog | Shuttle Swaggers - Best Badminton Club in Watford & West London',
@@ -166,72 +166,145 @@ export default function BlogsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Badminton Blog
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Expert tips, training guides, and local badminton news from Watford's premier badminton club serving North West London, West London, and North London
-          </p>
+        {/* Enhanced Hero Section */}
+        <div className="relative text-center mb-16">
+          {/* Background Elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-100 rounded-full opacity-20"></div>
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-green-100 rounded-full opacity-20"></div>
+          </div>
           
-          {/* Search Bar */}
-          <div className="max-w-md mx-auto relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              type="search"
-              placeholder="Search articles..."
-              className="pl-10 pr-4 py-2 w-full"
-            />
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full mb-6">
+              <BookOpen className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-700">Expert Badminton Content</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Badminton Blog
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
+              Expert tips, training guides, and local badminton news from Watford's premier badminton club serving 
+              <span className="font-semibold text-blue-600"> North West London, West London, and North London</span>
+            </p>
+            
+            {/* Enhanced Search Bar */}
+            <div className="max-w-xl mx-auto relative mb-8">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Input
+                type="search"
+                placeholder="Search badminton tips, techniques, local venues..."
+                className="pl-12 pr-4 py-4 w-full text-lg border-2 border-gray-200 focus:border-blue-500 rounded-xl shadow-sm"
+              />
+            </div>
+            
+            {/* Quick Stats */}
+            <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span>12+ Expert Articles</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>5 Categories</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                <span>Weekly Updates</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={category === 'All' ? 'default' : 'outline'}
-              className="mb-2"
-            >
-              {category}
-            </Button>
-          ))}
+        {/* Enhanced Category Filter */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
+            Explore by Category
+          </h2>
+          <div className="flex flex-wrap justify-center gap-3">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={category === 'All' ? 'default' : 'outline'}
+                className={`mb-2 px-6 py-3 rounded-full transition-all duration-200 ${
+                  category === 'All' 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' 
+                    : 'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700'
+                }`}
+              >
+                {category === 'All' && '🏆 '}
+                {category === 'Local SEO' && '📍 '}
+                {category === 'Beginner Guide' && '🌟 '}
+                {category === 'Technical Training' && '🎯 '}
+                {category === 'Club News' && '📰 '}
+                {category === 'Health & Fitness' && '💪 '}
+                {category}
+              </Button>
+            ))}
+          </div>
         </div>
 
-        {/* Featured Posts */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Featured Articles</h2>
+        {/* Enhanced Featured Posts */}
+        <section className="mb-20">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-yellow-50 px-4 py-2 rounded-full mb-4">
+              <span className="text-2xl">✨</span>
+              <span className="text-sm font-medium text-yellow-700">Must Read</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Articles</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Our most popular and comprehensive guides, chosen by badminton experts
+            </p>
+          </div>
+          
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredPosts.map((post) => (
-              <Card key={post.slug} className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge className={getCategoryColor(post.category)}>
+            {featuredPosts.map((post, index) => (
+              <Card key={post.slug} className={`group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
+                index === 0 ? 'md:col-span-2 lg:col-span-1' : ''
+              }`}>
+                {/* Featured Badge */}
+                <div className="absolute top-4 left-4 z-10">
+                  <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    ⭐ FEATURED
+                  </div>
+                </div>
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                <CardHeader className="relative">
+                  <div className="flex items-center justify-between mb-3">
+                    <Badge className={`${getCategoryColor(post.category)} shadow-sm`}>
+                      {post.category === 'Local SEO' && '📍 '}
+                      {post.category === 'Beginner Guide' && '🌟 '}
+                      {post.category === 'Technical Training' && '🎯 '}
                       {post.category}
                     </Badge>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Clock className="h-4 w-4 mr-1" />
+                    <div className="flex items-center text-sm text-gray-500 bg-white/80 px-2 py-1 rounded-full">
+                      <Clock className="h-3 w-3 mr-1" />
                       {post.readTime}
                     </div>
                   </div>
-                  <CardTitle className="text-xl hover:text-blue-600 transition-colors">
+                  <CardTitle className="text-xl font-bold group-hover:text-blue-600 transition-colors leading-tight">
                     <Link href={`/blogs/${post.slug}`}>
                       {post.title}
                     </Link>
                   </CardTitle>
-                  <CardDescription className="line-clamp-3">
+                  <CardDescription className="line-clamp-3 text-gray-600 leading-relaxed">
                     {post.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
+                
+                <CardContent className="pt-0">
+                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                     <div className="flex items-center">
-                      <User className="h-4 w-4 mr-1" />
+                      <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2">
+                        {post.author.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </div>
                       {post.author}
                     </div>
                     <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
+                      <Calendar className="h-3 w-3 mr-1" />
                       {new Date(post.date).toLocaleDateString('en-GB', {
                         day: 'numeric',
                         month: 'short',
@@ -239,6 +312,14 @@ export default function BlogsPage() {
                       })}
                     </div>
                   </div>
+                  
+                  <Link 
+                    href={`/blogs/${post.slug}`}
+                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm group-hover:gap-3 transition-all duration-200"
+                  >
+                    Read Article
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
