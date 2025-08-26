@@ -1,6 +1,6 @@
 export const ADMIN_CREDENTIALS = {
-  username: "shuttleswaggers@gmail.com",
-  password: "Admin@2022",
+  username: process.env.ADMIN_USERNAME || "shuttleswaggers@gmail.com",
+  password: process.env.ADMIN_PASSWORD || "Admin@2022",
 };
 
 export function verifyBasicAuth(authHeader: string | null): boolean {

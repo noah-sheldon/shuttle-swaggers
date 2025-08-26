@@ -12,14 +12,14 @@ const SESSION_TEMPLATES: SessionTemplate[] = [
   {
     dayOfWeek: 2, // Tuesday
     location: 'Watford Central',
-    courts: 3,
+    courts: 2,
     startHour: 20, // 8 PM
     startMinute: 0
   },
   {
     dayOfWeek: 4, // Thursday
     location: 'Fuller Health Life Centre',
-    courts: 3,
+    courts: 4,
     startHour: 20, // 8 PM
     startMinute: 0
   }
