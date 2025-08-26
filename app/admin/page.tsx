@@ -100,6 +100,33 @@ export default function AdminPage() {
     }
   };
 
+  const resetSessionData = async (type: 'session' | 'historical') => {
+    if (!liveSession) return;
+    
+    try {
+      const response = await fetch(`/api/sessions/${liveSession._id}/control`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: type === 'session' ? 'reset_session_ratings' : 'reset_historical_ratings'
+        }),
+      });
+
+      if (response.ok) {
+        alert(`${type === 'session' ? 'Session ratings' : 'Historical data'} reset successfully`);
+        await fetchLiveSession(); // Refresh data
+      } else {
+        const error = await response.json();
+        alert(error.error || `Failed to reset ${type} data`);
+      }
+    } catch (error) {
+      console.error(`Error resetting ${type} data:`, error);
+      alert(`Failed to reset ${type} data`);
+    }
+  };
+
   return (
     <div className="pt-16 min-h-screen bg-gray-50">
       <div className="container mx-auto px-6 py-12">
@@ -110,7 +137,47 @@ export default function AdminPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
-                Generate Sessions
+                Session Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <Button 
+                  asChild
+                  className="w-full bg-[#004d40] hover:bg-[#00695c] text-white"
+                >
+                  <a href="/admin/session-config">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Configure New Session
+                  </a>
+                </Button>
+                <Button 
+                  onClick={generateSessions}
+                  disabled={loading}
+                  variant="outline"
+                  className="w-full border-[#ff6f00] text-[#ff6f00] hover:bg-[#ff6f00] hover:text-white"
+                >
+                  {loading ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Generate Bulk Sessions
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Bulk Session Generation
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -159,6 +226,48 @@ export default function AdminPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Session Data Management */}
+          {liveSession && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5" />
+                  Session Data Controls
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Button
+                    onClick={() => resetSessionData('session')}
+                    variant="outline"
+                    className="w-full border-[#ff6f00] text-[#ff6f00] hover:bg-[#ff6f00] hover:text-white"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Reset Session Ratings
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (confirm('This will permanently delete all historical performance data. Are you sure?')) {
+                        resetSessionData('historical');
+                      }
+                    }}
+                    variant="outline"
+                    className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Reset Historical Data
+                  </Button>
+                </div>
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Session Ratings:</strong> Resets current session wins/losses/ratings but keeps historical data.<br />
+                    <strong>Historical Data:</strong> Permanently deletes all historical performance data.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Live Session Management */}
           <Card className="mb-6">

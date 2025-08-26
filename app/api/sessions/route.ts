@@ -18,13 +18,24 @@ export async function POST(request: NextRequest) {
     const sessionData = {
       date: new Date(body.date),
       location: body.location,
-      courts: body.courts,
+      config: {
+        game_type: 'partnership_rotation' as const,
+        scoring_system: 'single_set_21' as const,
+        court_count: body.courts,
+        max_duration_minutes: 120,
+        skill_balancing: true
+      },
+      courts_data: [],
       player_data: [],
       matches: [],
       rankings: [],
       is_live: false,
       status: 'upcoming' as const,
-      waiting_queue: []
+      waiting_queue: [],
+      next_up_queue: [],
+      
+      // Legacy support
+      courts: body.courts
     };
 
     const session = await SessionModel.create(sessionData);

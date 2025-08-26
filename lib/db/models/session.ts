@@ -109,4 +109,13 @@ export class SessionModel {
       .toArray();
     return sessions.map(s => ({ ...s, _id: s._id.toString() } as Session));
   }
+
+  static async updateSession(sessionId: string, sessionData: Partial<Session>): Promise<void> {
+    const db = await getDb();
+    const { _id, ...updateData } = sessionData;
+    await db.collection(this.collection).updateOne(
+      { _id: new ObjectId(sessionId) },
+      { $set: updateData }
+    );
+  }
 }

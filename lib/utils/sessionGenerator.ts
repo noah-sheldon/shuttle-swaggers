@@ -42,18 +42,30 @@ export function generateSessions(startDate: Date, monthsAhead: number = 2): Omit
     
     if (template) {
       const sessionDate = new Date(currentDate);
-      sessionDate.setHours(template.startHour, template.startMinute, 0, 0);
+      // Set time in UTC to avoid timezone issues
+      sessionDate.setUTCHours(template.startHour, template.startMinute, 0, 0);
       
       sessions.push({
         date: sessionDate,
         location: template.location,
-        courts: template.courts,
+        config: {
+          game_type: 'partnership_rotation',
+          scoring_system: 'single_set_21',
+          court_count: template.courts,
+          max_duration_minutes: 120,
+          skill_balancing: true
+        },
+        courts_data: [],
         player_data: [],
         matches: [],
         rankings: [],
         is_live: false,
         status: 'upcoming',
-        waiting_queue: []
+        waiting_queue: [],
+        next_up_queue: [],
+        
+        // Legacy support
+        courts: template.courts
       });
     }
     

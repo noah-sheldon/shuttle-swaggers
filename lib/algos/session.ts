@@ -20,7 +20,8 @@ export class SessionAlgorithm {
       courts.push({
         court_number: i + 1,
         players: courtPlayers,
-        is_active: true
+        is_active: true,
+        status: 'in_progress'
       });
     }
 
@@ -63,7 +64,7 @@ export class SessionAlgorithm {
     const [p1, p2, p3, p4] = playerIds;
     
     // Get player data for partnership history
-    const getPlayerData = (id: string) => 
+    const getPlayerData = (id: string): Player => 
       playerData.find(p => p.player_id === id) || {
         player_id: id,
         name: '',
@@ -71,8 +72,12 @@ export class SessionAlgorithm {
         losses: 0,
         points_for: 0,
         points_against: 0,
-        played_with: [],
-        played_against: []
+        played_with: [] as string[],
+        played_against: [] as string[],
+        skill_rating: 500,
+        session_skill_rating: 500,
+        is_active: true,
+        is_paused: false
       };
 
     const pd1 = getPlayerData(p1);

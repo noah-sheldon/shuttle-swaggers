@@ -9,18 +9,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Trophy, Clock, MapPin, Plus, Minus, Target } from 'lucide-react';
+import { Users, Trophy, Clock, MapPin, Target } from 'lucide-react';
 import { Player, Match, Court } from '@/types';
+import { NextPlayersDisplay } from '@/components/ui/next-players-display';
+import { useMatchTimer, useSessionTimer } from '@/hooks/useMatchTimer';
 
 export default function GamesPage() {
   const [liveSession, setLiveSession] = useState<any>(null);
   const [courts, setCourts] = useState<Court[]>([]);
   const [waitingQueue, setWaitingQueue] = useState<string[]>([]);
   const [rankings, setRankings] = useState<Player[]>([]);
-  const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
-  const [scores, setScores] = useState<[number, number]>([21, 0]);
   const [loading, setLoading] = useState(true);
-  const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,7 +59,8 @@ export default function GamesPage() {
         if (data) {
           setLiveSession(data);
           // Extract courts and waiting queue from session data
-          // This would require implementing court state tracking in the backend
+          setCourts(data.courts_data || []);
+          setWaitingQueue(data.waiting_queue || []);
           setRankings(data.rankings || []);
         }
       }
@@ -71,47 +71,7 @@ export default function GamesPage() {
     }
   };
 
-  const handleScoreSubmit = async () => {
-    if (!selectedCourt || !liveSession) return;
 
-    const match: Match = {
-      match_id: `match_${Date.now()}`,
-      teams: [
-        [selectedCourt.players[0], selectedCourt.players[1]],
-        [selectedCourt.players[2], selectedCourt.players[3]]
-      ],
-      scores: scores,
-      winner_team_index: scores[0] > scores[1] ? 0 : 1,
-      court_number: selectedCourt.court_number
-    };
-
-    try {
-      const response = await fetch('/api/sessions/match', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: liveSession._id,
-          match
-        }),
-      });
-
-      if (response.ok) {
-        setIsScoreModalOpen(false);
-        setSelectedCourt(null);
-        setScores([21, 0]);
-        fetchLiveSession(); // Refresh data
-      }
-    } catch (error) {
-      console.error('Error submitting match:', error);
-    }
-  };
-
-  const openScoreModal = (court: Court) => {
-    setSelectedCourt(court);
-    setIsScoreModalOpen(true);
-  };
 
   const formatDate = (date: string) => {
     return new Intl.DateTimeFormat('en-GB', {
@@ -200,88 +160,145 @@ export default function GamesPage() {
         <div className="container mx-auto px-6">
           <Tabs defaultValue="courts" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="courts">Courts & Matches</TabsTrigger>
-              <TabsTrigger value="queue">Waiting Queue</TabsTrigger>
-              <TabsTrigger value="rankings">Live Rankings</TabsTrigger>
+              <TabsTrigger value="courts">Live Courts</TabsTrigger>
+              <TabsTrigger value="queue">Queue & Next</TabsTrigger>
+              <TabsTrigger value="rankings">Rankings</TabsTrigger>
             </TabsList>
 
             {/* Courts Tab */}
             <TabsContent value="courts" className="space-y-6">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.from({ length: liveSession.courts }, (_, i) => i + 1).map((courtNum) => (
-                  <Card key={courtNum} className="court-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-center">
-                        <CardTitle className="text-[#004d40]">Court {courtNum}</CardTitle>
-                        <Badge variant="outline" className="bg-green-50 text-green-700">
-                          Active
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="text-xs font-semibold text-[#ff6f00] uppercase tracking-wider">Team 1</div>
-                          <div className="space-y-1">
-                            <div className="font-medium">Player A</div>
-                            <div className="font-medium">Player B</div>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="text-xs font-semibold text-[#ff6f00] uppercase tracking-wider">Team 2</div>
-                          <div className="space-y-1">
-                            <div className="font-medium">Player C</div>
-                            <div className="font-medium">Player D</div>
-                          </div>
-                        </div>
-                      </div>
+              <div className="grid lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-3">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {courts.map((court) => {
+                      const courtPlayers = court.players.map(playerId => 
+                        liveSession?.player_data.find((p: Player) => p.player_id === playerId)?.name || 'Unknown'
+                      );
                       
-                      <Button 
-                        className="w-full bg-[#ff6f00] hover:bg-[#e65100] text-white"
-                        onClick={() => openScoreModal({
-                          court_number: courtNum,
-                          players: ['Player A', 'Player B', 'Player C', 'Player D'],
-                          is_active: true
-                        })}
-                      >
-                        <Target className="w-4 h-4 mr-2" />
-                        Enter Score
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                      return (
+                        <Card key={court.court_number} className="court-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                          <CardHeader className="pb-3">
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-2">
+                                <CardTitle className="text-[#004d40]">Court {court.court_number}</CardTitle>
+                                {court.current_match?.start_time && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {/* Timer would be implemented here */}
+                                    {Math.floor((Date.now() - new Date(court.current_match.start_time).getTime()) / 60000)}m
+                                  </Badge>
+                                )}
+                              </div>
+                              <Badge 
+                                variant="outline" 
+                                className={
+                                  court.status === 'in_progress' ? 'bg-green-50 text-green-700' :
+                                  court.status === 'paused' ? 'bg-yellow-50 text-yellow-700' :
+                                  court.status === 'maintenance' ? 'bg-red-50 text-red-700' :
+                                  'bg-blue-50 text-blue-700'
+                                }
+                              >
+                                {court.status.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <div className="text-xs font-semibold text-[#ff6f00] uppercase tracking-wider">Team 1</div>
+                                <div className="space-y-1">
+                                  <div className="font-medium text-sm">{courtPlayers[0] || 'Empty'}</div>
+                                  <div className="font-medium text-sm">{courtPlayers[1] || 'Empty'}</div>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <div className="text-xs font-semibold text-[#ff6f00] uppercase tracking-wider">Team 2</div>
+                                <div className="space-y-1">
+                                  <div className="font-medium text-sm">{courtPlayers[2] || 'Empty'}</div>
+                                  <div className="font-medium text-sm">{courtPlayers[3] || 'Empty'}</div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {court.current_match && (
+                              <div className="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
+                                <span>Score:</span>
+                                <span className="font-bold">
+                                  {court.current_match.scores[0]} - {court.current_match.scores[1]}
+                                </span>
+                              </div>
+                            )}
+                            
+                            <div className="text-center">
+                              <div className="text-sm text-gray-600">
+                                Match in progress - View only
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+                
+                {/* Next Players Side Panel */}
+                <div className="lg:col-span-1">
+                  <NextPlayersDisplay
+                    nextUpQueue={liveSession?.next_up_queue || []}
+                    playerData={liveSession?.player_data || []}
+                    courts={courts}
+                    showStartButton={false}
+                  />
+                </div>
               </div>
             </TabsContent>
 
             {/* Queue Tab */}
-            <TabsContent value="queue">
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="text-[#004d40] flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    Waiting Queue ({waitingQueue.length} players)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {waitingQueue.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>No players in queue</p>
-                    </div>
-                  ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {waitingQueue.map((playerId, index) => (
-                        <div key={playerId} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div>
-                            <div className="font-medium">Player {index + 1}</div>
-                            <div className="text-sm text-gray-500">Position #{index + 1}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+            <TabsContent value="queue" className="space-y-6">
+              <div className="grid lg:grid-cols-2 gap-6">
+                
+                {/* Waiting Queue */}
+                <Card className="border-0 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="text-[#004d40] flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      Waiting Queue ({waitingQueue.length} players)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {waitingQueue.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>No players in queue</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {waitingQueue.map((playerId, index) => {
+                          const player = liveSession?.player_data.find((p: Player) => p.player_id === playerId);
+                          return (
+                            <div key={playerId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                              <div>
+                                <div className="font-medium">{player?.name || `Player ${index + 1}`}</div>
+                                <div className="text-sm text-gray-500">Position #{index + 1}</div>
+                              </div>
+                              <div className="text-xs text-gray-400">
+                                Rating: {player?.session_skill_rating || 500}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Next Players */}
+                <NextPlayersDisplay
+                  nextUpQueue={liveSession?.next_up_queue || []}
+                  playerData={liveSession?.player_data || []}
+                  courts={courts}
+                  showStartButton={false}
+                />
+              </div>
             </TabsContent>
 
             {/* Rankings Tab */}
@@ -340,93 +357,6 @@ export default function GamesPage() {
         </div>
       </section>
 
-      {/* Score Entry Modal */}
-      <Dialog open={isScoreModalOpen} onOpenChange={setIsScoreModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-[#004d40]">
-              Enter Match Score - Court {selectedCourt?.court_number}
-            </DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="text-center space-y-3">
-                <div className="text-sm font-semibold text-[#ff6f00] uppercase tracking-wider">Team 1</div>
-                <div className="space-y-1 text-sm">
-                  <div>Player A</div>
-                  <div>Player B</div>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setScores([Math.max(0, scores[0] - 1), scores[1]])}
-                    disabled={scores[0] <= 0}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <div className="w-16 text-center text-2xl font-bold text-[#004d40]">
-                    {scores[0]}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setScores([scores[0] + 1, scores[1]])}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="text-center space-y-3">
-                <div className="text-sm font-semibold text-[#ff6f00] uppercase tracking-wider">Team 2</div>
-                <div className="space-y-1 text-sm">
-                  <div>Player C</div>
-                  <div>Player D</div>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setScores([scores[0], Math.max(0, scores[1] - 1)])}
-                    disabled={scores[1] <= 0}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <div className="w-16 text-center text-2xl font-bold text-[#004d40]">
-                    {scores[1]}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setScores([scores[0], scores[1] + 1])}
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between">
-              <Button
-                variant="outline"
-                onClick={() => setIsScoreModalOpen(false)}
-                className="border-[#004d40] text-[#004d40] hover:bg-[#004d40] hover:text-white"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleScoreSubmit}
-                className="bg-[#ff6f00] hover:bg-[#e65100] text-white"
-                disabled={Math.max(scores[0], scores[1]) < 21 || Math.abs(scores[0] - scores[1]) < 2}
-              >
-                Submit Score
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

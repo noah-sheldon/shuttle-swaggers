@@ -69,6 +69,14 @@ export function Navbar() {
               Live Games
             </Link>
             <Link 
+              href="/blogs" 
+              className={`hover:text-[#ff6f00] transition-colors ${
+                isScrolled ? 'text-[#004d40]' : 'text-white'
+              }`}
+            >
+              Blog
+            </Link>
+            <Link 
               href="/contact" 
               className={`hover:text-[#ff6f00] transition-colors ${
                 isScrolled ? 'text-[#004d40]' : 'text-white'
@@ -127,6 +135,13 @@ export function Navbar() {
                 onClick={() => setIsOpen(false)}
               >
                 Live Games
+              </Link>
+              <Link 
+                href="/blogs" 
+                className="block px-3 py-2 text-[#004d40] hover:text-[#ff6f00]"
+                onClick={() => setIsOpen(false)}
+              >
+                Blog
               </Link>
               <Link 
                 href="/contact" 
