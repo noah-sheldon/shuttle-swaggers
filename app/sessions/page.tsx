@@ -108,8 +108,8 @@ export default function SessionsPage() {
       <section ref={headerRef} className="py-20 bg-[#004d40] text-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="page-title text-5xl font-bold mb-6">Upcoming Sessions</h1>
-            <p className="text-xl opacity-90">
+            <h1 className="page-title text-3xl md:text-5xl font-bold mb-6">Upcoming Sessions</h1>
+            <p className="text-lg md:text-xl opacity-90">
               Join our advanced/high intermediate badminton sessions in Watford. 
               Guest sessions available for £12 per session.
             </p>
@@ -142,47 +142,49 @@ export default function SessionsPage() {
                   key={session._id} 
                   className="session-card border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
                 >
-                  <div className="flex">
+                  <div className="flex flex-col md:flex-row">
                     {/* Date Column */}
-                    <div className="bg-[#004d40] text-white p-6 flex flex-col items-center justify-center min-w-[150px]">
-                      <div className="text-3xl font-bold">
+                    <div className="bg-[#004d40] text-white p-4 md:p-6 flex flex-row md:flex-col items-center justify-center md:min-w-[150px]">
+                      <div className="text-2xl md:text-3xl font-bold mr-4 md:mr-0">
                         {new Date(session.date).getDate()}
                       </div>
-                      <div className="text-sm opacity-90">
-                        {new Date(session.date).toLocaleDateString('en-GB', { month: 'short' })}
-                      </div>
-                      <div className="text-xs opacity-75">
-                        {new Date(session.date).getFullYear()}
+                      <div className="flex flex-col md:items-center">
+                        <div className="text-sm opacity-90">
+                          {new Date(session.date).toLocaleDateString('en-GB', { month: 'short' })}
+                        </div>
+                        <div className="text-xs opacity-75">
+                          {new Date(session.date).getFullYear()}
+                        </div>
                       </div>
                     </div>
 
                     {/* Session Details */}
-                    <div className="flex-1 p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
+                    <div className="flex-1 p-4 md:p-6">
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4">
+                        <div className="mb-4 md:mb-0">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <Calendar className="w-5 h-5 text-[#ff6f00]" />
-                            <span className="font-semibold text-[#004d40]">
+                            <span className="font-semibold text-[#004d40] text-sm md:text-base">
                               {formatDate(session.date)}
                             </span>
                             {session.is_live && (
                               <Badge className="bg-red-500 text-white">Live</Badge>
                             )}
                           </div>
-                          <div className="flex items-center gap-4 text-gray-600 mb-3">
+                          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-gray-600 mb-3">
                             <div className="flex items-center gap-2">
                               <Clock className="w-4 h-4" />
-                              <span>{formatTime(session.date)} - {formatTime(new Date(new Date(session.date).getTime() + 2 * 60 * 60 * 1000))}</span>
+                              <span className="text-sm">{formatTime(session.date)} - {formatTime(new Date(new Date(session.date).getTime() + 2 * 60 * 60 * 1000))}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Users className="w-4 h-4" />
-                              <span>{session.courts} Courts</span>
+                              <span className="text-sm">{session.courts} Courts</span>
                             </div>
                           </div>
                           <div className="space-y-2">
                             <div className="flex items-center gap-2 text-gray-600">
                               <MapPin className="w-4 h-4" />
-                              <span>{session.location}</span>
+                              <span className="text-sm">{session.location}</span>
                             </div>
                             {(() => {
                               const venue = getVenueDetails(session.location);
@@ -215,18 +217,18 @@ export default function SessionsPage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-[#ff6f00] mb-1">£12</div>
-                          <div className="text-sm text-gray-600">Guest Fee</div>
+                          <div className="text-xl md:text-2xl font-bold text-[#ff6f00] mb-1">£12</div>
+                          <div className="text-xs md:text-sm text-gray-600">Guest Fee</div>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center">
-                        <div className="text-sm text-gray-600">
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                        <div className="text-xs md:text-sm text-gray-600">
                           Advanced/High Intermediate • Feather Shuttlecocks
                         </div>
                         <Button 
                           onClick={() => handleSignupClick(session)}
-                          className="bg-[#ff6f00] hover:bg-[#e65100] text-white font-semibold"
+                          className="bg-[#ff6f00] hover:bg-[#e65100] text-white font-semibold w-full md:w-auto"
                           disabled={session.is_live}
                         >
                           {session.is_live ? 'Session in Progress' : 'Sign Up as Guest'}

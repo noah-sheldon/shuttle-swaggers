@@ -42,8 +42,11 @@ export function generateSessions(startDate: Date, monthsAhead: number = 2): Omit
     
     if (template) {
       const sessionDate = new Date(currentDate);
-      // Set time in UTC to avoid timezone issues
-      sessionDate.setUTCHours(template.startHour, template.startMinute, 0, 0);
+      // Set time in London timezone (BST is UTC+1 in summer, GMT is UTC+0 in winter)
+      // For sessions at 8pm London time, we need to account for timezone offset
+      const isInBST = currentDate.getMonth() >= 2 && currentDate.getMonth() <= 9; // March to October (roughly BST period)
+      const utcHour = isInBST ? template.startHour - 1 : template.startHour; // 8pm London = 7pm UTC during BST
+      sessionDate.setUTCHours(utcHour, template.startMinute, 0, 0);
       
       sessions.push({
         date: sessionDate,

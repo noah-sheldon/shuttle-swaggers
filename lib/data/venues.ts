@@ -4,7 +4,7 @@ export const VENUE_DETAILS: Record<string, VenueDetails> = {
   'Watford Central': {
     name: 'Watford Central Leisure Centre',
     address: 'Hempstead Rd, Watford WD18 0DE',
-    mapsUrl: 'https://maps.app.goo.gl/2MzvEd78kPKQChgD7',
+    mapsUrl: 'https://maps.app.goo.gl/m76MvaP2S3iw3d2N6',
     parkingUrl: 'https://maps.app.goo.gl/U857rtydT9Aaktmf9',
     parkingAddress: 'Parking entrance via Hempstead Road'
   },

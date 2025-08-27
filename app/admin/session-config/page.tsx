@@ -10,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Save, Settings, Users, Trophy, Timer, Target } from 'lucide-react';
+import { ArrowLeft, Save, Settings, Users, Trophy, Timer, Target, Plus } from 'lucide-react';
 import { GameType, PegSystemMode, ScoringSystem, SessionConfig } from '@/types';
 
 export default function SessionConfigPage() {
@@ -23,14 +23,28 @@ export default function SessionConfigPage() {
   });
 
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
-  const [availablePlayers] = useState([
-    'John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson', 
-    'Tom Brown', 'Lisa Davis', 'Chris Lee', 'Amy Clark',
-    'David White', 'Emma Taylor', 'Ryan Miller', 'Sophie Anderson',
-    'James Wilson', 'Olivia Moore', 'Lucas Garcia', 'Isabella Martinez',
-    'Mason Rodriguez', 'Charlotte Lopez', 'Ethan Gonzalez', 'Amelia Hernandez',
-    'Alexander Perez', 'Mia Torres', 'Benjamin Rivera', 'Harper Flores'
-  ]);
+  const [availablePlayers, setAvailablePlayers] = useState([
+    // Regular Players - Group 1
+    'AB', 'Bipin', 'Noah Sheldon', 'Andrew Blake', 'Amit Sanghvi', 
+    'Amit Shah', 'PB', 'Navendu', 'Kelvin', 'Raj Subramanian', 
+    'Romel Palma', 'Arvin', 'Vinesh', 'Nimesh Arya', 'Madhavan (Maddy)', 
+    'Anil Abraham', 'Joseph Chan', 'Hari', 'Sunil M',
+    
+    // Regular Players - Group 2  
+    'Ganesh MK', 'Neel', 'Arun'
+  ].sort()); // Sort alphabetically for easier selection
+
+  const [newPlayerName, setNewPlayerName] = useState('');
+  const [showAddPlayer, setShowAddPlayer] = useState(false);
+
+  const addNewPlayer = () => {
+    if (newPlayerName.trim() && !availablePlayers.includes(newPlayerName.trim())) {
+      setAvailablePlayers(prev => [...prev, newPlayerName.trim()].sort());
+      setSelectedPlayers(prev => [...prev, newPlayerName.trim()]);
+      setNewPlayerName('');
+      setShowAddPlayer(false);
+    }
+  };
 
   const updateConfig = (key: keyof SessionConfig, value: any) => {
     setConfig(prev => ({ ...prev, [key]: value }));
@@ -297,12 +311,61 @@ export default function SessionConfigPage() {
               {/* Player Selection */}
               <Card className="border-0 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[#004d40]">
-                    <Users className="w-5 h-5" />
-                    Player Selection ({selectedPlayers.length} selected)
-                  </CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-[#004d40]">
+                      <Users className="w-5 h-5" />
+                      Player Selection ({selectedPlayers.length} selected)
+                    </CardTitle>
+                    <Button
+                      onClick={() => setShowAddPlayer(!showAddPlayer)}
+                      variant="outline"
+                      size="sm"
+                      className="border-[#ff6f00] text-[#ff6f00] hover:bg-[#ff6f00] hover:text-white"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add New Player
+                    </Button>
+                  </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
+                  
+                  {/* Add New Player Form */}
+                  {showAddPlayer && (
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Enter player name"
+                          value={newPlayerName}
+                          onChange={(e) => setNewPlayerName(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && addNewPlayer()}
+                          className="flex-1"
+                        />
+                        <Button
+                          onClick={addNewPlayer}
+                          disabled={!newPlayerName.trim() || availablePlayers.includes(newPlayerName.trim())}
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          Add
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setShowAddPlayer(false);
+                            setNewPlayerName('');
+                          }}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                      {newPlayerName.trim() && availablePlayers.includes(newPlayerName.trim()) && (
+                        <p className="text-red-600 text-xs mt-1">Player already exists</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Player Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                     {availablePlayers.map(player => (
                       <div
@@ -318,11 +381,31 @@ export default function SessionConfigPage() {
                       </div>
                     ))}
                   </div>
-                  {selectedPlayers.length < 4 && (
-                    <p className="text-red-600 text-sm mt-4">
-                      Select at least 4 players to start a session
-                    </p>
-                  )}
+                  
+                  {/* Selection Actions */}
+                  <div className="flex justify-between items-center pt-3 border-t">
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => setSelectedPlayers(availablePlayers)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Select All
+                      </Button>
+                      <Button
+                        onClick={() => setSelectedPlayers([])}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Clear All
+                      </Button>
+                    </div>
+                    {selectedPlayers.length < 4 && (
+                      <p className="text-red-600 text-sm">
+                        Select at least 4 players to start a session
+                      </p>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>

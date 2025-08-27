@@ -21,8 +21,8 @@ export function Navbar() {
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${
       isScrolled 
-        ? 'bg-white/95 backdrop-blur-md shadow-lg' 
-        : 'bg-transparent'
+        ? 'bg-[#004d40]/95 backdrop-blur-md shadow-lg' 
+        : 'bg-[#004d40]/90'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -35,9 +35,7 @@ export function Navbar() {
               height={40} 
               className="rounded-full"
             />
-            <span className={`font-bold text-xl ${
-              isScrolled ? 'text-[#004d40]' : 'text-white'
-            }`}>
+            <span className="font-bold text-xl text-white">
               Shuttle Swaggers
             </span>
           </Link>
@@ -46,51 +44,33 @@ export function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             <Link 
               href="/" 
-              className={`hover:text-[#ff6f00] transition-colors ${
-                isScrolled ? 'text-[#004d40]' : 'text-white'
-              }`}
+              className="text-white hover:text-[#ff6f00] transition-colors"
             >
               Home
             </Link>
             <Link 
               href="/sessions" 
-              className={`hover:text-[#ff6f00] transition-colors ${
-                isScrolled ? 'text-[#004d40]' : 'text-white'
-              }`}
+              className="text-white hover:text-[#ff6f00] transition-colors"
             >
               Sessions
             </Link>
             <Link 
               href="/games" 
-              className={`hover:text-[#ff6f00] transition-colors ${
-                isScrolled ? 'text-[#004d40]' : 'text-white'
-              }`}
+              className="text-white hover:text-[#ff6f00] transition-colors"
             >
-              Live Games
+              Games
             </Link>
             <Link 
               href="/blogs" 
-              className={`hover:text-[#ff6f00] transition-colors ${
-                isScrolled ? 'text-[#004d40]' : 'text-white'
-              }`}
+              className="text-white hover:text-[#ff6f00] transition-colors"
             >
               Blog
             </Link>
             <Link 
               href="/contact" 
-              className={`hover:text-[#ff6f00] transition-colors ${
-                isScrolled ? 'text-[#004d40]' : 'text-white'
-              }`}
+              className="text-white hover:text-[#ff6f00] transition-colors"
             >
               Contact
-            </Link>
-            <Link 
-              href="/history" 
-              className={`hover:text-[#ff6f00] transition-colors ${
-                isScrolled ? 'text-[#004d40]' : 'text-white'
-              }`}
-            >
-              History
             </Link>
             <Button 
               asChild
@@ -104,7 +84,7 @@ export function Navbar() {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`${isScrolled ? 'text-[#004d40]' : 'text-white'}`}
+              className="text-white"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -134,7 +114,7 @@ export function Navbar() {
                 className="block px-3 py-2 text-[#004d40] hover:text-[#ff6f00]"
                 onClick={() => setIsOpen(false)}
               >
-                Live Games
+                Games
               </Link>
               <Link 
                 href="/blogs" 
@@ -149,13 +129,6 @@ export function Navbar() {
                 onClick={() => setIsOpen(false)}
               >
                 Contact
-              </Link>
-              <Link 
-                href="/history" 
-                className="block px-3 py-2 text-[#004d40] hover:text-[#ff6f00]"
-                onClick={() => setIsOpen(false)}
-              >
-                History
               </Link>
               <div className="px-3 py-2">
                 <Button 
