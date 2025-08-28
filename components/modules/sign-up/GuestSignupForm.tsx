@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 // import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Check, Loader2, MapPin, Clock, Calendar } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface SessionData {
   _id: string;
@@ -111,6 +112,7 @@ export function GuestSignupForm({ session, onBack, onComplete }: GuestSignupForm
 
       if (response.ok) {
         setIsComplete(true);
+        toast.success('Registration successful! Welcome to Shuttle Swaggers!');
         setTimeout(() => {
           onComplete();
         }, 3000);
@@ -119,7 +121,7 @@ export function GuestSignupForm({ session, onBack, onComplete }: GuestSignupForm
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('There was an error submitting your form. Please try again.');
+      toast.error('There was an error submitting your form. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

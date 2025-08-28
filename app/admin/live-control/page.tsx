@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Player, Court } from '@/types';
 import { NextPlayersDisplay } from '@/components/ui/next-players-display';
+import { toast } from 'sonner';
 
 export default function LiveControlPage() {
   const [liveSession, setLiveSession] = useState<any>(null);
@@ -81,10 +82,10 @@ export default function LiveControlPage() {
         fetchLiveSession();
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to add player');
+        toast.error(error.error || 'Failed to add player');
       }
     } catch (error) {
-      alert('Failed to add player');
+      toast.error('Failed to add player');
     }
   };
 
@@ -102,10 +103,10 @@ export default function LiveControlPage() {
         fetchLiveSession();
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to remove player');
+        toast.error(error.error || 'Failed to remove player');
       }
     } catch (error) {
-      alert('Failed to remove player');
+      toast.error('Failed to remove player');
     }
   };
 
@@ -122,10 +123,10 @@ export default function LiveControlPage() {
         fetchLiveSession();
       } else {
         const error = await response.json();
-        alert(error.error || `Failed to ${action}`);
+        toast.error(error.error || `Failed to ${action}`);
       }
     } catch (error) {
-      alert(`Failed to ${action}`);
+      toast.error(`Failed to ${action}`);
     }
   };
 
@@ -141,10 +142,10 @@ export default function LiveControlPage() {
         fetchLiveSession();
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to add court');
+        toast.error(error.error || 'Failed to add court');
       }
     } catch (error) {
-      alert('Failed to add court');
+      toast.error('Failed to add court');
     }
   };
 
@@ -162,10 +163,10 @@ export default function LiveControlPage() {
         fetchLiveSession();
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to remove court');
+        toast.error(error.error || 'Failed to remove court');
       }
     } catch (error) {
-      alert('Failed to remove court');
+      toast.error('Failed to remove court');
     }
   };
 
@@ -192,10 +193,10 @@ export default function LiveControlPage() {
         fetchLiveSession();
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to substitute player');
+        toast.error(error.error || 'Failed to substitute player');
       }
     } catch (error) {
-      alert('Failed to substitute player');
+      toast.error('Failed to substitute player');
     }
   };
 
@@ -231,7 +232,7 @@ export default function LiveControlPage() {
         fetchLiveSession();
       }
     } catch (error) {
-      alert('Failed to submit score');
+      toast.error('Failed to submit score');
     }
   };
 

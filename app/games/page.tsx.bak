@@ -320,8 +320,7 @@ export default function GamesPage() {
                             </div>
                           </div>
                         </div>
-                        );
-                      })}
+                      ))}
                     </div>
                   )}
                 </CardContent>
@@ -500,6 +499,46 @@ export default function GamesPage() {
                   </Card>
                 </TabsContent>
 
+                <TabsContent value="rankings" className="space-y-4">
+                  <div className="space-y-3">
+                    {selectedSession.rankings?.map((player: Player, index: number) => (
+                      <Card 
+                        key={player.player_id} 
+                        className="p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                        onClick={() => handlePlayerClick(player, selectedSession)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                              index === 0 ? 'bg-yellow-500' :
+                              index === 1 ? 'bg-gray-400' :
+                              index === 2 ? 'bg-yellow-600' :
+                              'bg-[#004d40]'
+                            }`}>
+                              {index + 1}
+                            </div>
+                            <div>
+                              <div className="font-semibold text-[#004d40]">{player.name}</div>
+                              <div className="text-sm text-gray-500">
+                                {player.wins}W - {player.losses}L • Rating: {player.session_skill_rating}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-semibold text-[#004d40]">
+                              {player.wins + player.losses > 0 
+                                ? `${Math.round((player.wins / (player.wins + player.losses)) * 100)}%` 
+                                : '0%'}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              +{player.points_for - player.points_against} pts
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
 
                 <TabsContent value="matches" className="space-y-4">
                   <div className="space-y-3">

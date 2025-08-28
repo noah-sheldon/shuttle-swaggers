@@ -6,7 +6,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { config } = await request.json();
+    const { config, player_data } = await request.json();
     const params = await context.params;
     const { id } = params;
 
@@ -18,6 +18,17 @@ export async function POST(
 
     // Update session configuration
     session.config = { ...session.config, ...config };
+
+    // Update player data if provided
+    if (player_data && Array.isArray(player_data)) {
+      session.player_data = player_data;
+      // Initialize waiting queue with all paused players
+      const pausedPlayerIds = player_data
+        .filter(p => p.is_paused)
+        .map(p => p.player_id);
+      session.waiting_queue = [];
+      session.next_up_queue = [];
+    }
 
     // If court count changed, adjust courts_data
     if (config.court_count && config.court_count !== session.courts_data.length) {

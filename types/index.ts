@@ -43,7 +43,7 @@ export interface VenueDetails {
 }
 
 export type SessionStatus = 'upcoming' | 'live' | 'completed';
-export type GameType = 'partnership_rotation' | 'tournament_single' | 'round_robin' | 'peg_system';
+export type GameType = 'partnership_rotation' | 'tournament_single' | 'round_robin' | 'peg_system' | 'full_rotation';
 export type PegSystemMode = 'balanced_teams' | 'skill_based_courts';
 export type ScoringSystem = 'single_set_21' | 'best_of_3' | 'time_limited';
 

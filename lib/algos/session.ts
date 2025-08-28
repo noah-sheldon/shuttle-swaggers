@@ -57,7 +57,7 @@ export class SessionAlgorithm {
   /**
    * Find the best partnerships to minimize repeat partnerships
    */
-  private static findBestPartnerships(
+  static findBestPartnerships(
     playerIds: string[],
     playerData: Player[]
   ): [string[], string[]] {

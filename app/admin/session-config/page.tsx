@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Save, Settings, Users, Trophy, Timer, Target, Plus } from 'lucide-react';
 import { GameType, PegSystemMode, ScoringSystem, SessionConfig } from '@/types';
+import { toast } from 'sonner';
 
 export default function SessionConfigPage() {
   const [config, setConfig] = useState<SessionConfig>({
@@ -120,15 +121,15 @@ export default function SessionConfigPage() {
       });
 
       if (response.ok) {
-        alert('Session configuration saved successfully!');
+        toast.success('Session configuration saved successfully!');
         // Redirect to admin dashboard
         window.location.href = '/admin';
       } else {
-        alert('Failed to save session configuration');
+        toast.error('Failed to save session configuration');
       }
     } catch (error) {
       console.error('Error saving configuration:', error);
-      alert('Failed to save session configuration');
+      toast.error('Failed to save session configuration');
     }
   };
 

@@ -26,6 +26,8 @@ export class TournamentAlgorithms {
         return this.initializeRoundRobin(activePlayers, config);
       case 'peg_system':
         return this.initializePegSystem(activePlayers, config);
+      case 'full_rotation':
+        return this.initializeFullRotation(activePlayers, config);
       default:
         throw new Error(`Unsupported game type: ${config.game_type}`);
     }
@@ -193,6 +195,66 @@ export class TournamentAlgorithms {
   }
 
   /**
+   * Full Rotation System - 4 players on, remaining players rotate systematically
+   */
+  private static initializeFullRotation(
+    players: Player[], 
+    config: SessionConfig
+  ): {
+    courts_data: Court[];
+    waiting_queue: string[];
+    next_up_queue: string[];
+  } {
+    // Shuffle players to ensure random initial assignment
+    const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
+    
+    const playersNeeded = config.court_count * 4;
+    const activePlayers = shuffledPlayers.slice(0, playersNeeded);
+    const rotationQueue = shuffledPlayers.slice(playersNeeded);
+
+    const courts_data: Court[] = [];
+    
+    for (let i = 0; i < config.court_count; i++) {
+      const courtPlayers = activePlayers.slice(i * 4, (i + 1) * 4);
+      
+      // Create balanced teams for initial setup
+      const teams = this.createBalancedTeamsForRotation(courtPlayers);
+      
+      courts_data.push({
+        court_number: i + 1,
+        players: [...teams[0], ...teams[1]],
+        is_active: true,
+        status: 'in_progress'
+      });
+    }
+
+    const waiting_queue = rotationQueue.map(p => p.player_id);
+    // Next up should be enough for one complete rotation (4 players)
+    const next_up_queue = waiting_queue.slice(0, Math.min(4, waiting_queue.length));
+
+    return { courts_data, waiting_queue, next_up_queue };
+  }
+
+  /**
+   * Create balanced teams for full rotation - ensures variety
+   */
+  private static createBalancedTeamsForRotation(players: Player[]): [string[], string[]] {
+    if (players.length !== 4) {
+      // Fallback for incomplete courts
+      return [[players[0]?.player_id, players[1]?.player_id], [players[2]?.player_id, players[3]?.player_id]];
+    }
+
+    // Sort by skill rating for balanced team creation
+    const sorted = [...players].sort((a, b) => b.session_skill_rating - a.session_skill_rating);
+    
+    // Create teams: [best + worst] vs [2nd best + 2nd worst]
+    return [
+      [sorted[0].player_id, sorted[3].player_id],
+      [sorted[1].player_id, sorted[2].player_id]
+    ];
+  }
+
+  /**
    * Generate next matches after completion
    */
   static generateNextMatch(
@@ -214,6 +276,8 @@ export class TournamentAlgorithms {
         return this.handleRoundRobinProgression(completedMatch, session, config);
       case 'peg_system':
         return this.handlePegSystemProgression(completedMatch, session, config);
+      case 'full_rotation':
+        return this.handleFullRotationProgression(completedMatch, session, config);
       default:
         throw new Error(`Unsupported game type: ${config.game_type}`);
     }
@@ -362,6 +426,72 @@ export class TournamentAlgorithms {
       updatedCourts: session.courts_data,
       updatedWaitingQueue: session.waiting_queue,
       updatedNextUpQueue: session.next_up_queue
+    };
+  }
+
+  private static handleFullRotationProgression(completedMatch: Match, session: any, config: SessionConfig) {
+    // Full rotation: systematic player rotation ensuring everyone gets equal play time
+    const updatedCourts = [...session.courts_data];
+    let updatedWaitingQueue = [...session.waiting_queue];
+    
+    // Find the court that just finished
+    const completedCourtIndex = updatedCourts.findIndex(c => c.court_number === completedMatch.court_number);
+    if (completedCourtIndex === -1) {
+      // Fallback if court not found
+      return {
+        updatedCourts: session.courts_data,
+        updatedWaitingQueue: session.waiting_queue,
+        updatedNextUpQueue: session.next_up_queue
+      };
+    }
+
+    const completedCourt = updatedCourts[completedCourtIndex];
+    
+    // Get players from completed match
+    const allMatchPlayers = [...completedMatch.teams[0], ...completedMatch.teams[1]];
+    
+    // Rotate players: move current players to end of queue, bring in next players
+    if (updatedWaitingQueue.length >= 4) {
+      // Get next 4 players from queue
+      const nextPlayers = updatedWaitingQueue.slice(0, 4);
+      
+      // Remove next players from waiting queue
+      updatedWaitingQueue = updatedWaitingQueue.slice(4);
+      
+      // Add current players to end of waiting queue
+      updatedWaitingQueue = [...updatedWaitingQueue, ...allMatchPlayers];
+      
+      // Create new balanced teams with incoming players
+      const playerData = session.player_data || [];
+      const nextPlayerObjects = nextPlayers.map((playerId: string) => 
+        playerData.find((p: any) => p.player_id === playerId) || { player_id: playerId, session_skill_rating: 500 }
+      );
+      
+      const newTeams = this.createBalancedTeamsForRotation(nextPlayerObjects);
+      
+      // Update court with new players
+      updatedCourts[completedCourtIndex] = {
+        ...completedCourt,
+        players: [...newTeams[0], ...newTeams[1]],
+        status: 'in_progress',
+        is_active: true
+      };
+    } else {
+      // Not enough players for full rotation, keep current players on court
+      updatedCourts[completedCourtIndex] = {
+        ...completedCourt,
+        status: 'in_progress',
+        is_active: true
+      };
+    }
+    
+    // Update next up queue
+    const updatedNextUpQueue = updatedWaitingQueue.slice(0, Math.min(4, updatedWaitingQueue.length));
+    
+    return {
+      updatedCourts,
+      updatedWaitingQueue,
+      updatedNextUpQueue
     };
   }
 

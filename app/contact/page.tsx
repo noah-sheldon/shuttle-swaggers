@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Clock, Mail, Phone, Users, Trophy, MessageCircle, Send } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -71,12 +72,13 @@ export default function ContactPage() {
       if (response.ok) {
         setIsSubmitted(true);
         setFormData({ name: '', email: '', subject: '', message: '' });
+        toast.success('Message sent successfully! We\'ll get back to you soon.');
       } else {
         throw new Error('Failed to send message');
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('There was an error sending your message. Please try again or contact us directly.');
+      toast.error('There was an error sending your message. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
     }
