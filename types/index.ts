@@ -98,6 +98,73 @@ export interface GuestSignUp {
   created_at: Date;
 }
 
+export interface TournamentPlayer {
+  playerId: string;
+  name: string;
+}
+
+export interface TournamentTeam {
+  id: string;
+  name: string;
+  players: TournamentPlayer[];
+}
+
+export interface TournamentMatch {
+  id: string;
+  teamAId: string;
+  teamBId: string;
+  roundId: string;
+  court: number;
+}
+
+export interface TournamentRound {
+  id: string;
+  title: string;
+  matches: TournamentMatch[];
+}
+
+export type TournamentStatus = 'draft' | 'live' | 'completed';
+
+export interface TournamentMatchResult {
+  scoreA: number;
+  scoreB: number;
+  roundId: string;
+  court: number;
+  updatedAt: Date;
+}
+
+export interface TournamentPlayerStats {
+  playerId: string;
+  name: string;
+  teamId: string;
+  teamName: string;
+  wins: number;
+  gamesPlayed: number;
+  points: number;
+  pointDiff: number;
+}
+
+export interface TournamentTeamStats {
+  teamId: string;
+  name: string;
+  wins: number;
+  gamesPlayed: number;
+  points: number;
+  pointDiff: number;
+}
+
+export interface TournamentRecord {
+  _id?: string;
+  teams: TournamentTeam[];
+  courtCount: number;
+  rounds: TournamentRound[];
+  status: TournamentStatus;
+  results: Record<string, TournamentMatchResult>;
+  createdAt: Date;
+  updatedAt: Date;
+  playerRankings?: TournamentPlayerStats[];
+}
+
 export interface Court {
   court_number: number;
   players: string[]; // player_ids (length 4)

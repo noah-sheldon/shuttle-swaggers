@@ -1,87 +1,117 @@
-import { Session } from '@/types';
+import { Session } from "@/types";
 
 export interface SessionTemplate {
-  dayOfWeek: number; // 0 = Sunday, 1 = Monday, 2 = Tuesday, 4 = Thursday
-  location: 'Watford Central' | 'Fuller Health Life Centre';
+  dayOfWeek: number;
+  location: "Watford Central" | "Fuller Health Life Centre";
   courts: number;
-  startHour: number;
+  startHour: number; // London time
   startMinute: number;
 }
 
 const SESSION_TEMPLATES: SessionTemplate[] = [
   {
     dayOfWeek: 2, // Tuesday
-    location: 'Watford Central',
+    location: "Watford Central",
     courts: 2,
-    startHour: 20, // 8 PM
-    startMinute: 0
+    startHour: 20,
+    startMinute: 0,
   },
   {
     dayOfWeek: 4, // Thursday
-    location: 'Fuller Health Life Centre',
+    location: "Fuller Health Life Centre",
     courts: 4,
-    startHour: 20, // 8 PM
-    startMinute: 0
-  }
+    startHour: 20,
+    startMinute: 0,
+  },
 ];
 
-export function generateSessions(startDate: Date, monthsAhead: number = 2): Omit<Session, '_id'>[] {
-  const sessions: Omit<Session, '_id'>[] = [];
+/**
+ * Convert a London local time into a UTC Date safely.
+ */
+function londonTimeToUTC(date: Date, hour: number, minute: number) {
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  // Format the desired London datetime
+  const parts = formatter.formatToParts(
+    new Date(
+      Date.UTC(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        hour,
+        minute
+      )
+    )
+  );
+
+  const obj: any = {};
+  for (const p of parts) if (p.type !== "literal") obj[p.type] = p.value;
+
+  // Build ISO string manually
+  const iso = `${obj.year}-${obj.month}-${obj.day}T${obj.hour}:${obj.minute}:${obj.second}Z`;
+
+  return new Date(iso);
+}
+
+export function generateSessions(
+  startDate: Date,
+  monthsAhead: number = 2
+): Omit<Session, "_id">[] {
+  const sessions: Omit<Session, "_id">[] = [];
+
   const endDate = new Date(startDate);
   endDate.setMonth(endDate.getMonth() + monthsAhead);
 
-  // Start from the given start date
-  const currentDate = new Date(startDate);
-  
-  // Find the next Tuesday (August 26, 2025)
-  while (currentDate <= endDate) {
-    const dayOfWeek = currentDate.getDay();
-    
-    // Check if current date matches any of our session templates
-    const template = SESSION_TEMPLATES.find(t => t.dayOfWeek === dayOfWeek);
-    
+  const cursor = new Date(startDate);
+
+  while (cursor <= endDate) {
+    const dayOfWeek = cursor.getDay();
+
+    const template = SESSION_TEMPLATES.find((t) => t.dayOfWeek === dayOfWeek);
+
     if (template) {
-      const sessionDate = new Date(currentDate);
-      // Set time in London timezone (BST is UTC+1 in summer, GMT is UTC+0 in winter)
-      // For sessions at 8pm London time, we need to account for timezone offset
-      const isInBST = currentDate.getMonth() >= 2 && currentDate.getMonth() <= 9; // March to October (roughly BST period)
-      const utcHour = isInBST ? template.startHour - 1 : template.startHour; // 8pm London = 7pm UTC during BST
-      sessionDate.setUTCHours(utcHour, template.startMinute, 0, 0);
-      
+      // Convert 8 PM London time → correct UTC time automatically
+      const dateUTC = londonTimeToUTC(
+        cursor,
+        template.startHour,
+        template.startMinute
+      );
+
       sessions.push({
-        date: sessionDate,
+        date: dateUTC,
         location: template.location,
         config: {
-          game_type: 'partnership_rotation',
-          scoring_system: 'single_set_21',
+          game_type: "partnership_rotation",
+          scoring_system: "single_set_21",
           court_count: template.courts,
           max_duration_minutes: 120,
-          skill_balancing: true
+          skill_balancing: true,
         },
         courts_data: [],
         player_data: [],
         matches: [],
         rankings: [],
         is_live: false,
-        status: 'upcoming',
+        status: "upcoming",
         waiting_queue: [],
         next_up_queue: [],
-        
-        // Legacy support
-        courts: template.courts
+
+        // legacy
+        courts: template.courts,
       });
     }
-    
-    // Move to next day
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  
-  return sessions;
-}
 
-export function getNextSessionDate(dayOfWeek: number, referenceDate: Date = new Date()): Date {
-  const date = new Date(referenceDate);
-  const days = (dayOfWeek + 7 - date.getDay()) % 7;
-  date.setDate(date.getDate() + days);
-  return date;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return sessions;
 }
